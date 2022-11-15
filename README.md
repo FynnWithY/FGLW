@@ -5,4 +5,5 @@ Supports only Windows for now.
 ## Platforms
 - Windows
 
-`$ git clone --recurse-submodules https://github.com/jdah/minecraft-weekend.git`
+## Functions
+- 
