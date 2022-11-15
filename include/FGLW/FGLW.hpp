@@ -97,19 +97,69 @@ private:
     FGLWeventCallbackFunc m_eventCallback=nullptr;
 public:
     FGLW(/* args */)=default;
+    /*
+        creates window
+        @param[in] width width of the window
+        @param[in] height height of the window
+        @param[in] title title of the window
+    */
     FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title);
+    /*
+        polls window events and dispatches them
+        @returns if 0 the window closed
+    */
     bool PollEvents();
+    /*
+        Swaps the OpenGl buffers
+    */
     void SwapBuffers();
     ~FGLW();
+    /*
+        Makes Window current OpenGL Context
+    */
     void MakeContextCurrent();
+    /*
+        Dispatches Window Event
+        @param[in] type type of Event
+        @param[in] e event Data
+    */
     static void DispatchEvent(FGLWeventType type,FGLWvoidp e);
+    /*
+        Initialises OpenGL functions, call after seting a Context
+    */
     static void GLInit();
-    void SetUserData(void* data);
+    /*
+        sets a void*, which can be retrieved using GetUserData()
+        @param[in] data void* to the user data
+    */
+    void SetUserData(FGLWvoidp data);
+    /*
+        retrieves a void* to the user data set by SetUserData()
+        @result void* to the user data
+    */
     void* GetUserData();
+    /*
+        sets a the event callback function of the window
+        @param[in] func the event callback Function
+    */
     void SetEventCallbackFunction(FGLWeventCallbackFunc func);
+    /*
+        sets an parameter of the window, must be called before the window is created
+        @param[in] parameter the paramter type
+        @param[in] value the value to set the parameter to
+    */
     static void SetParameter(FGLWparameter parameter,FGLWu8 value);
+    /*
+        sets all window paramters to their default value
+    */
     void ResetParameters();
+    /*
+        sets the size of the window to the screen size
+    */
     void MakeFullscreen();
+    /*
+        sets all window paramters to 0
+    */
     static void ClearParameters();
 };
 
