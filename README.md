@@ -14,10 +14,12 @@ Supports only Windows for now.
     polls events and returns 0 if window should close \
     ` bool PollEvents();` \
     usage: \
-    `if(!window.PollEvents()) 
+    ``` c++
+    if(!window.PollEvents()) 
     {     
         running=0;
-    } `
+    } 
+    ```
 - ### Swap Buffers
     swaps the window buffers \
     `void SwapBuffers();`
