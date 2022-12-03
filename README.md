@@ -7,13 +7,18 @@ Supports only Windows for now.
 ## Functions
 
 - ### Create Window 
-    ` FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title); ` \
-    usage: \
-    `FGLW window=FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title);`
+    ```c++
+    FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title);
+    ``` 
+    usage: 
+    ```c++ 
+    FGLW window=FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title);```
 - ### Poll Events 
-    polls events and returns 0 if window should close \
-    ` bool PollEvents();` \
-    usage: \
+    polls events and returns 0 if window should close 
+    ```c++
+     bool PollEvents();
+    ``` 
+    usage: 
     ``` c++
     if(!window.PollEvents()) 
     {     
@@ -22,7 +27,9 @@ Supports only Windows for now.
     ```
 - ### Swap Buffers
     swaps the window buffers \
-    `void SwapBuffers();`
+    ``` c++
+    void SwapBuffers();
+    ``` 
 - ### Make Context Current
     makes the window the current opengl context \
     `void MakeContextCurrent();`

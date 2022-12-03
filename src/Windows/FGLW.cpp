@@ -6,9 +6,9 @@
 #include<assert.h>
 
 //#pragma comment (lib, "opengl32.lib")
-
-FGLW *FGLW::CurrentContext;
-FGLWu8 FGLW::parameters[FGLW_PARAM_LAST]={0,1,1,1,1,1,1,1,0,0,0};
+namespace FGLW{
+FGLW *FGLW::FGLW::CurrentContext;
+u8 FGLW::FGLW::parameters[PARAM_LAST]={0,1,1,1,1,1,1,1,0,0,0};
 static void Win32SwapBuffers(HDC hdc)
 {
     SwapBuffers(hdc);
@@ -17,24 +17,24 @@ static void loadGL()
 {
     gladLoadGL();
 }
-void FGLW::GLInit()
+void FGLW::FGLW::GLInit()
 {
     loadGL();
 }
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-FGLW::FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title):
+FGLW::FGLW::FGLW(int x,int y,u32 width,u32 height,string title):
     m_hInstance(GetModuleHandle(nullptr)),
     width(width),
     height(height),
     m_title(title),
-	m_classTitle("WINDOW  ")
+	m_classTitle(title)
 {
 	//((char*)(m_classTitle))[6]=1;
-    #ifndef FGLW_INCLUDE_NONE
+    #ifndef INCLUDE_NONE
         GLInit();
     #endif
-	FGLWvoidp oldContext=FGLW::CurrentContext;
-    FGLW::CurrentContext=this;
+	voidptr oldContext=FGLW::FGLW::CurrentContext;
+    FGLW::FGLW::CurrentContext=this;
     WNDCLASS wndClass={}; 
  
     wndClass.lpszClassName=m_classTitle;
@@ -46,34 +46,34 @@ FGLW::FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title):
     wndClass.style = CS_HREDRAW | CS_VREDRAW;
 
     RegisterClass(&wndClass);
-    //DWORD style=WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU;
+    DWORD style=
+			(WS_OVERLAPPED * 		(u8)(FGLW::FGLW::parameters[OVERLAPPED])) |
+			(WS_CAPTION *			(u8)(FGLW::FGLW::parameters[CAPTION]))| 
+			(WS_SYSMENU *			(u8)(FGLW::FGLW::parameters[SYSMENU]))| 
+			(WS_THICKFRAME * 		(u8)(FGLW::FGLW::parameters[THICKFRAME]))| 
+			(WS_MINIMIZEBOX *		(u8)(FGLW::FGLW::parameters[MINIMIZEBOX]))| 
+			(WS_MAXIMIZEBOX *		(u8)(FGLW::FGLW::parameters[MAXIMIZEBOX]))| 
+			(WS_VISIBLE * 			(u8)(FGLW::FGLW::parameters[VISIBLE]))|
+			(WS_POPUP * 			(u8)(FGLW::FGLW::parameters[POPUP]))| 
+			(WS_BORDER * 			(u8)(FGLW::FGLW::parameters[BORDER]))|
+			(WS_CHILD * 			(u8)(FGLW::FGLW::parameters[CHILD]))|
+			(WS_MAXIMIZE * 			(u8)(FGLW::FGLW::parameters[FULLSCREEN]));
 //
-    //RECT rect;
-    //rect.left=250;
-    //rect.top=250;
-    //rect.right=rect.left+width;
-    //rect.bottom=rect.top+height;
-//
-    //AdjustWindowRect(&rect,style,false);
+    RECT rect;
+    rect.left=x;
+    rect.top=y;
+    rect.right=rect.left+width;
+    rect.bottom=rect.top+height;
+
+    AdjustWindowRect(&rect,style,false);
     m_hwnd = CreateWindow(    
         wndClass.lpszClassName, 
         title, 
-        	(WS_OVERLAPPED * 		(FGLWu8)(FGLW::parameters[FGLW_OVERLAPPED])) |
-			(WS_CAPTION *			(FGLWu8)(FGLW::parameters[FGLW_CAPTION]))| 
-			(WS_SYSMENU *			(FGLWu8)(FGLW::parameters[FGLW_SYSMENU]))| 
-			(WS_THICKFRAME * 		(FGLWu8)(FGLW::parameters[FGLW_THICKFRAME]))| 
-			(WS_MINIMIZEBOX *		(FGLWu8)(FGLW::parameters[FGLW_MINIMIZEBOX]))| 
-			(WS_MAXIMIZEBOX *		(FGLWu8)(FGLW::parameters[FGLW_MAXIMIZEBOX]))| 
-			(WS_VISIBLE * 			(FGLWu8)(FGLW::parameters[FGLW_VISIBLE]))|
-			(WS_POPUP * 			(FGLWu8)(FGLW::parameters[FGLW_POPUP]))| 
-			(WS_BORDER * 			(FGLWu8)(FGLW::parameters[FGLW_BORDER]))|
-			(WS_CHILD * 			(FGLWu8)(FGLW::parameters[FGLW_CHILD]))|
-			(WS_MAXIMIZE * 			(FGLWu8)(FGLW::parameters[FGLW_FULLSCREEN])),
-			//WS_OVERLAPPEDWINDOW|WS_VISIBLE,
-        CW_USEDEFAULT, 
-        CW_USEDEFAULT, 
-        width, 
-        height, 
+		style,
+        x, 
+        y, 
+        rect.right-rect.left, 
+        rect.bottom-rect.top, 
         0, 
         0, 
         m_hInstance, 
@@ -104,12 +104,11 @@ FGLW::FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title):
 	//	assert(false);
 	//	return;
 	//}
-	FGLW::CurrentContext=(FGLW*)oldContext;
+	FGLW::FGLW::CurrentContext=(FGLW*)oldContext;
 }
-bool FGLW::PollEvents()
+bool FGLW::FGLW::PollEvents()
 {
     MSG msg={};
-
     while(PeekMessage(&msg,nullptr,0u,0u,PM_REMOVE))
     {
         switch(msg.message)
@@ -122,12 +121,12 @@ bool FGLW::PollEvents()
     }
     return 1;
 }
-void FGLW::SwapBuffers()
+void FGLW::FGLW::SwapBuffers()
 {
     //wglSwapLayerBuffers(m_hdc,WGL_SWAP_MAIN_PLANE);
     Win32SwapBuffers(m_hdc);
 }
-FGLW::~FGLW()
+FGLW::FGLW::~FGLW()
 {
     UnregisterClass(m_title,m_hInstance);
 }
@@ -137,11 +136,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_CREATE:
-		FGLW::DispatchEvent(FGLW_WINDOW_CREATE,NULL);
+		FGLW::FGLW::DispatchEvent(WINDOW_CREATE,NULL);
         break;
     case WM_CLOSE:
         DestroyWindow(hwnd);
-        FGLW::DispatchEvent(FGLW_WINDOW_CLOSE,NULL);
+        FGLW::FGLW::DispatchEvent(WINDOW_CLOSE,NULL);
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
@@ -152,16 +151,56 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		GetClientRect(hwnd, &rect);
 		int width = rect.right - rect.left;
 		int height = rect.bottom - rect.top;
-		FGLWwindowResizeEvent event=FGLWwindowResizeEvent(width,height);
-        FGLW::DispatchEvent(FGLW_WINDOW_RESIZE,&event);
+		WindowResizeEvent event=WindowResizeEvent(width,height);
+        FGLW::FGLW::DispatchEvent(WINDOW_RESIZE,&event);
         break;}
 	case WM_KEYDOWN:{
-		FGLWkeyEvent event(FGLW_KEY_DOWN,(FGLWu32)wParam);
-		FGLW::DispatchEvent(FGLW_KEY_EVENT,&event);
+		KeyEvent event(KEY_DOWN,(u32)wParam);
+		FGLW::FGLW::DispatchEvent(KEY_PRESS_EVENT,&event);
 		break;}
 	case WM_KEYUP:{
-		FGLWkeyEvent event(FGLW_KEY_UP,(FGLWu32)wParam);
-		FGLW::DispatchEvent(FGLW_KEY_EVENT,&event);
+		KeyEvent event(KEY_UP,(u32)wParam);
+		FGLW::FGLW::DispatchEvent(KEY_PRESS_EVENT,&event);
+		break;}
+	case WM_MOUSEMOVE:{
+		POINT p;
+		GetCursorPos(&p);
+		MouseMoveEvent event((short)lParam,(short)((int32_t)lParam>>16)); 
+		FGLW::FGLW::DispatchEvent(MOUSE_MOVE,&event);
+		break;}
+	case WM_MOUSELEAVE:{
+		FGLW::FGLW::DispatchEvent(MOUSE_LEAVE,nullptr);
+		break;}
+	case WM_MOUSEACTIVATE:{
+		FGLW::FGLW::DispatchEvent(MOUSE_ACTIVATE,nullptr);
+		break;}
+	case WM_MOUSEWHEEL:{
+		MouseWheelEvent event(HIWORD(wParam));
+		FGLW::FGLW::DispatchEvent(MOUSE_WHEEL,&event);
+		break;}
+	case WM_RBUTTONDOWN:{
+		MouseButtonEvent event(BUTTON_DOWN,1);
+		FGLW::FGLW::DispatchEvent(MOUSE_BUTTON,&event);
+		break;}
+	case WM_RBUTTONUP:{
+		MouseButtonEvent event(BUTTON_UP,1);
+		FGLW::FGLW::DispatchEvent(MOUSE_BUTTON,&event);
+		break;}
+	case WM_LBUTTONDOWN:{
+		MouseButtonEvent event(BUTTON_DOWN,0);
+		FGLW::FGLW::DispatchEvent(MOUSE_BUTTON,&event);
+		break;}
+	case WM_LBUTTONUP:{
+		MouseButtonEvent event(BUTTON_UP,0);
+		FGLW::FGLW::DispatchEvent(MOUSE_BUTTON,&event);
+		break;}
+	case WM_MBUTTONDOWN:{
+		MouseButtonEvent event(BUTTON_DOWN,2);
+		FGLW::FGLW::DispatchEvent(MOUSE_BUTTON,&event);
+		break;}
+	case WM_MBUTTONUP:{
+		MouseButtonEvent event(BUTTON_UP,2);
+		FGLW::FGLW::DispatchEvent(MOUSE_BUTTON,&event);
 		break;}
     default:
         break;
@@ -170,10 +209,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hwnd,uMsg,wParam,lParam);
 }
 
-void FGLW::MakeContextCurrent()
+void FGLW::FGLW::MakeContextCurrent()
 {
-    FGLW::CurrentContext=this;
-    FGLW& context=*FGLW::CurrentContext;
+    FGLW::FGLW::CurrentContext=this;
+    FGLW& context=*FGLW::FGLW::CurrentContext;
     if (!wglMakeCurrent(m_hdc, m_renderingContext)) {
 		std::cout << "OpenGL context creation failed" << std::endl;
 		assert(false);
@@ -181,67 +220,67 @@ void FGLW::MakeContextCurrent()
 	}
 }
 
-void FGLW::DispatchEvent(FGLWeventType type,FGLWvoidp e)
+void FGLW::FGLW::DispatchEvent(EventType type,voidptr e)
 {
-    FGLW& context=*FGLW::CurrentContext;
+    FGLW& context=*FGLW::FGLW::CurrentContext;
     switch (type)
     {
-    case FGLW_WINDOW_CLOSE:{
+    case WINDOW_CLOSE:{
         context.m_flags|=FGLW_WINDOW_CLOSED;
         wglDeleteContext(context.m_renderingContext);
         break;}
-    case FGLW_WINDOW_RESIZE:{
-        FGLWwindowResizeEvent& event=*(FGLWwindowResizeEvent*)e;
+    case WINDOW_RESIZE:{
+        WindowResizeEvent& event=*(WindowResizeEvent*)e;
         context.width=event.width;
         context.height=event.height;
         break;}
-    case FGLW_WINDOW_CREATE:{
+    case WINDOW_CREATE:{
         break;}
-	case FGLW_KEY_EVENT:{
+	case KEY_PRESS_EVENT:{
 		break;}
     default:
         break;
     }
 	if(context.m_eventCallback!=nullptr)
 	{
-		context.m_eventCallback(FGLW::CurrentContext,type,e);
+		context.m_eventCallback(FGLW::FGLW::CurrentContext,type,e);
 	}
 }
-void FGLW::SetUserData(void* data)
+void FGLW::FGLW::SetUserData(void* data)
 {
 	this->m_userData=data;
 }
-void* FGLW::GetUserData()
+void* FGLW::FGLW::GetUserData()
 {
 	return m_userData;
 }
-void FGLW::SetEventCallbackFunction(FGLWeventCallbackFunc func)
+void FGLW::FGLW::SetEventCallbackFunction(EventCallbackFunc func)
 {
 	this->m_eventCallback=func;
 }
-void FGLW::SetParameter(FGLWparameter parameter,FGLWu8 value)
+void FGLW::FGLW::SetParameter(Parameter parameter,u8 value)
 {
-	FGLW::parameters[parameter]=value;
+	FGLW::FGLW::parameters[parameter]=value;
 }
-void FGLW::ResetParameters()
+void FGLW::FGLW::ResetParameters()
 {
-	for(int i=0;i<FGLW_PARAM_LAST;i++)
+	for(int i=0;i<PARAM_LAST;i++)
 	{
-		FGLW::parameters[i]=FGLW_DEFAULT_PARAMETERS[i];
+		FGLW::FGLW::parameters[i]=DEFAULT_PARAMETERS[i];
 	}
 }
-void FGLW::MakeFullscreen()
+void FGLW::FGLW::MakeFullscreen()
 {
 	ShowWindow(m_hwnd,SHOW_FULLSCREEN);
 }
-void FGLW::ClearParameters()
+void FGLW::FGLW::ClearParameters()
 {
-	for(int i=0;i<FGLW_PARAM_LAST;i++)
+	for(int i=0;i<PARAM_LAST;i++)
 	{
-		FGLW::parameters[i]=0;
+		FGLW::FGLW::parameters[i]=0;
 	}
 }
-
+}
 /*GLAD*/
 /*
 

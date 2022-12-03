@@ -15,7 +15,7 @@ const char *fragmentShaderSource = "#version 330 core\n"
                                    "void main()\n"
                                    "{\n"
                                    "   FragColor = texture2D(text,uv);\n"
-                                   "}\0";
+                                 "}\0";
 uint32 shaderProgram;
 void loadShader()
 {

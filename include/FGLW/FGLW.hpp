@@ -20,81 +20,98 @@
         #define FGLW_API __declspec(dllimport)
     #endif
 #endif  
-enum FGLWeventType
-{
-    FGLW_WINDOW_CREATE,
-    FGLW_WINDOW_CLOSE,
-    FGLW_WINDOW_RESIZE,
-    FGLW_KEY_EVENT
-};
-enum FGLWkeyMode
-{
-    FGLW_KEY_UP,
-    FGLW_KEY_DOWN,
-    FGLW_KEY_FIRST
-};
-enum FGLWparameter
-{
-    FGLW_FULLSCREEN,
-    FGLW_OVERLAPPED,
-    FGLW_CAPTION,
-    FGLW_SYSMENU,
-    FGLW_THICKFRAME,
-    FGLW_MINIMIZEBOX,
-    FGLW_MAXIMIZEBOX,
-    FGLW_VISIBLE,
-    FGLW_POPUP,
-    FGLW_BORDER,
-    FGLW_CHILD,
-    FGLW_PARAM_LAST
-};
 
-class FGLW;
-typedef unsigned char       FGLWu8;
-typedef unsigned short      FGLWu16;
-typedef unsigned int        FGLWu32,FGLWenu;
-typedef unsigned long long  FGLWu64;
-
-typedef char FGLWchar;
-typedef const char* FGLWstring;
-typedef float FGLWfloat;
-typedef void FGLWvoid,*FGLWvoidp;
-
-typedef void (*FGLWeventCallbackFunc)(FGLW* window,FGLWeventType type,FGLWvoidp eventData);
-
-#define FGL_DEBUG_COUNTER __COUNTER__
+#define FGLW_DEBUG_COUNTER __COUNTER__
 #ifdef FGLW_PLATFORM_WINDOWS
     #include <windows.h>
 #else 
     #error not implemented yet
 #endif
 
-
+#define FGLW_CAST_EVENTPTR(type,ptr) (type*)ptr
+#define FGLW_CAST_EVENT(type,ptr) *CAST_EVENTPTR((type*)ptr)
 #define FGLW_RESOLUTION_W 1024
 #define FGLW_RESOLUTION_H 540
 
 #define FGLW_WINDOW_CLOSED 1
+#ifdef FGLW_PLATFORM_WINDOWS
+    #define FGLW_WHEEL_DELTA WHEEL_DELTA
+#else 
+    #error not implemented yet
+#endif
 
-constexpr FGLWu8 FGLW_DEFAULT_PARAMETERS[FGLW_PARAM_LAST] = {0,1,1,1,1,1,1,1,0,0,0};
+namespace FGLW{
+enum EventType
+{
+    WINDOW_CREATE,
+    WINDOW_CLOSE,
+    WINDOW_RESIZE,
+    MOUSE_MOVE,
+    MOUSE_DRAG,
+    MOUSE_BUTTON,
+    MOUSE_LEAVE,
+    MOUSE_ACTIVATE,
+    MOUSE_WHEEL,
+    KEY_PRESS_EVENT
+};
+enum KeyMode
+{
+    KEY_UP,
+    KEY_DOWN,
+    KEY_FIRST
+};
+enum ButtonMode
+{
+    BUTTON_UP,
+    BUTTON_DOWN
+};
+enum Parameter
+{
+    FULLSCREEN,
+    OVERLAPPED,
+    CAPTION,
+    SYSMENU,
+    THICKFRAME,
+    MINIMIZEBOX,
+    MAXIMIZEBOX,
+    VISIBLE,
+    POPUP,
+    BORDER,
+    CHILD,
+    PARAM_LAST
+};
 
-#define FGLW_KEY_LAST 255
+class FGLW;
+typedef unsigned char       u8;
+typedef unsigned short      u16;
+typedef unsigned int        u32;
+typedef unsigned long long  u64;
+
+typedef const char* string;
+typedef void *voidptr;
+
+typedef void (*EventCallbackFunc)(FGLW* window,EventType type,voidptr eventData);
+
+constexpr u8 DEFAULT_PARAMETERS[PARAM_LAST] = {0,1,1,1,1,1,1,1,0,0,0};
+
+#define KEY_LAST 255
 class FGLW_API FGLW
 {
 private:
-    FGLWu32 width,height;
-    FGLWstring m_title;
+    u32 width,height;
+    string m_title;
     #ifdef FGLW_PLATFORM_WINDOWS
-        FGLWstring m_classTitle;
+        string m_classTitle;
         HINSTANCE m_hInstance;
         HWND m_hwnd;
         HDC m_hdc;
         HGLRC m_renderingContext;
     #endif
     static FGLW* CurrentContext;
-    static FGLWu8 parameters[FGLW_PARAM_LAST];
-    FGLWu32 m_flags,swapInterval=0;
-    FGLWvoidp m_userData;
-    FGLWeventCallbackFunc m_eventCallback=nullptr;
+    static u8 parameters[PARAM_LAST];
+    u32 m_flags,swapInterval=0;
+    voidptr m_userData;
+    EventCallbackFunc m_eventCallback=nullptr;
 public:
     FGLW(/* args */)=default;
     /*
@@ -103,7 +120,7 @@ public:
         @param[in] height height of the window
         @param[in] title title of the window
     */
-    FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title);
+    FGLW(int x,int y,u32 width,u32 height,string title);
     /*
         polls window events and dispatches them
         @returns if 0 the window closed
@@ -123,7 +140,7 @@ public:
         @param[in] type type of Event
         @param[in] e event Data
     */
-    static void DispatchEvent(FGLWeventType type,FGLWvoidp e);
+    static void DispatchEvent(EventType type,voidptr e);
     /*
         Initialises OpenGL functions, call after seting a Context
     */
@@ -132,7 +149,7 @@ public:
         sets a void*, which can be retrieved using GetUserData()
         @param[in] data void* to the user data
     */
-    void SetUserData(FGLWvoidp data);
+    void SetUserData(voidptr data);
     /*
         retrieves a void* to the user data set by SetUserData()
         @result void* to the user data
@@ -142,13 +159,13 @@ public:
         sets a the event callback function of the window
         @param[in] func the event callback Function
     */
-    void SetEventCallbackFunction(FGLWeventCallbackFunc func);
+    void SetEventCallbackFunction(EventCallbackFunc func);
     /*
         sets an parameter of the window, must be called before the window is created
         @param[in] parameter the paramter type
         @param[in] value the value to set the parameter to
     */
-    static void SetParameter(FGLWparameter parameter,FGLWu8 value);
+    static void SetParameter(Parameter parameter,u8 value);
     /*
         sets all window paramters to their default value
     */
@@ -163,27 +180,43 @@ public:
     static void ClearParameters();
 };
 
-struct FGLWevent
+struct Event
 {
-    FGLWeventType type;
-    FGLWevent(FGLWeventType type):type(type){}
+    EventType type;
+    Event(EventType type):type(type){}
 };
-struct FGLWwindowCloseEvent:FGLWevent
+struct WindowCloseEvent:Event
 {
-    FGLWwindowCloseEvent():FGLWevent(FGLW_WINDOW_CLOSE){}
+    WindowCloseEvent():Event(WINDOW_CLOSE){}
 };
-struct FGLWwindowResizeEvent:FGLWevent
+struct WindowResizeEvent:Event
 {
-    FGLWwindowResizeEvent(int width,int height):FGLWevent(FGLW_WINDOW_RESIZE),width(width),height(height){}
+    WindowResizeEvent(int width,int height):Event(WINDOW_RESIZE),width(width),height(height){}
     int width,height;
 };
-struct FGLWkeyEvent:FGLWevent
+struct KeyEvent:Event
 {
-    FGLWkeyEvent(FGLWu8 mode, FGLWu8 key):FGLWevent(FGLW_KEY_EVENT),mode(mode),key(key){}
-    FGLWu8 mode,key;
+    KeyEvent(u8 mode, u8 key):Event(KEY_PRESS_EVENT),mode(mode),key(key){}
+    u8 mode,key;
 };
 
-#ifndef FGLW_INCLUDE_NONE
+struct MouseMoveEvent:Event
+{
+    MouseMoveEvent(short x,short y):Event(MOUSE_MOVE),x(x),y(y){}
+    short x,y;
+};
+struct MouseWheelEvent:Event
+{
+    MouseWheelEvent(short d):Event(MOUSE_WHEEL),d(d){}
+    long d;
+};
+struct MouseButtonEvent:Event
+{
+    MouseButtonEvent(u8 mode, u8 button):Event(MOUSE_BUTTON),mode(mode),button(button){}
+    u8 mode,button;
+};
+}
+#ifndef INCLUDE_NONE
 /*GLAD
 get here https://glad.dav1d.de/*/
 /*
