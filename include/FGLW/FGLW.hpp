@@ -106,6 +106,8 @@ private:
         HWND m_hwnd;
         HDC m_hdc;
         HGLRC m_renderingContext;
+        HICON m_hWindowIcon=NULL;
+        HICON m_hWindowIconBig=NULL;
     #endif
     static FGLW* CurrentContext;
     static u8 parameters[PARAM_LAST];
@@ -174,6 +176,12 @@ public:
         sets the size of the window to the screen size
     */
     void MakeFullscreen();
+    /*
+        closes the window
+    */
+    void Close();
+    //changes window icon
+    void SetIcon(string path);
     /*
         sets all window paramters to 0
     */

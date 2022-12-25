@@ -12,7 +12,8 @@ Supports only Windows for now.
     ``` 
     usage: 
     ```c++ 
-    FGLW window=FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title);```
+    FGLW window=FGLW(FGLWu32 width,FGLWu32 height,FGLWstring title);
+    ```
 - ### Poll Events 
     polls events and returns 0 if window should close 
     ```c++

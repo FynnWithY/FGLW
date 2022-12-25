@@ -4,6 +4,7 @@
 #include<glad/glad.h>
 #include<iostream>
 #include<assert.h>
+#include<string>
 
 //#pragma comment (lib, "opengl32.lib")
 namespace FGLW{
@@ -42,6 +43,7 @@ FGLW::FGLW::FGLW(int x,int y,u32 width,u32 height,string title):
     wndClass.hIcon=LoadIcon(NULL,IDI_WINLOGO);
     wndClass.hCursor=LoadCursor(NULL,IDC_ARROW);
     wndClass.lpfnWndProc=WndProc;
+	wndClass.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE (32518));
     //wndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wndClass.style = CS_HREDRAW | CS_VREDRAW;
 
@@ -272,6 +274,22 @@ void FGLW::FGLW::ResetParameters()
 void FGLW::FGLW::MakeFullscreen()
 {
 	ShowWindow(m_hwnd,SHOW_FULLSCREEN);
+}
+void FGLW::Close()
+{
+	CloseWindow(m_hwnd);
+}
+void FGLW::SetIcon(string str)
+{
+	std::string stricon=str;
+    if(m_hWindowIcon!=NULL)
+        DestroyIcon(m_hWindowIcon);
+    if(m_hWindowIconBig!=NULL)
+        DestroyIcon(m_hWindowIconBig);
+    m_hWindowIcon =(HICON)LoadImage(GetModuleHandle(NULL), stricon.c_str(), IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+    m_hWindowIconBig =(HICON)LoadImage(GetModuleHandle(NULL), stricon.c_str(), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
+    SendMessage( m_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)m_hWindowIcon );
+    SendMessage( m_hwnd, WM_SETICON, ICON_BIG, (LPARAM)m_hWindowIconBig );
 }
 void FGLW::FGLW::ClearParameters()
 {
